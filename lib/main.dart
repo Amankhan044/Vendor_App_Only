@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:provider/provider.dart';
 import 'package:vendor_app_only/model/vendor_registration_provider.dart';
 import 'package:vendor_app_only/vendors/views/auth/vendor_auth_view.dart';
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         home:   VendorAuthView() ,
+         builder: EasyLoading.init(),
       ),
     );
   }

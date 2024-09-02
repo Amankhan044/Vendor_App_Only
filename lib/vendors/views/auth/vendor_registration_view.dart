@@ -10,6 +10,7 @@ class VendorRegistrationView extends StatelessWidget {
   Widget build(BuildContext context) {
     final _registrationProvider =
         Provider.of<VendorRegistrationProvider>(context, listen: false);
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -66,101 +67,139 @@ class VendorRegistrationView extends StatelessWidget {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(10.0),
-              child: Column(
-                children: [
-                  TextFormField(
-                    keyboardType: TextInputType.name,
-                    decoration: InputDecoration(labelText: 'Bussiness Name'),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  TextFormField(
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(labelText: 'Email Address'),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  TextFormField(
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(labelText: 'Phone NUmber'),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(14.0),
-                    child: SelectState(
-                      onCountryChanged: (value) {
-                        print("Country changed to: $value");
-                        _registrationProvider.setCountryValue(value);
+              child: Form(
+                key: _registrationProvider.formKey,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      keyboardType: TextInputType.name,
+                      decoration: InputDecoration(labelText: 'Business Name'),
+                      onChanged: (value) {
+                        _registrationProvider.businessName=value;
                       },
-                      onStateChanged: (value) {
-                        print("State changed to: $value");
-                        _registrationProvider.setStateValue(value);
-                      },
-                      onCityChanged: (value) {
-                        print("City changed to: $value");
-                        _registrationProvider.setCityValue(value);
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your business name';
+                        }
+                        return null;
                       },
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(14.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Tax Registered?",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w500),
-                        ),
-                        Flexible(
-                          child: Container(
-                            width: 150,
-                            child: DropdownButtonFormField(
-                                items: _registrationProvider.taxOptions
-                                    .map<DropdownMenuItem<String>>((value) {
-                                  return DropdownMenuItem<String>(
-                                      value: value, child: Text(value));
-                                }).toList(),
-                                onChanged: (value) {
-                                  _registrationProvider.checkTaxStatus(value!);
-                                }),
+                    SizedBox(height: 10),
+                    TextFormField(
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(labelText: 'Email Address'),
+                       onChanged: (value) {
+                        _registrationProvider.emailAddress=value;
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email address';
+                        } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                            .hasMatch(value)) {
+                          return 'Please enter a valid email address';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    TextFormField(
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(labelText: 'Phone Number'),
+                       onChanged: (value) {
+                        _registrationProvider.PhoneNumber=value;
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your phone number';
+                        } else if (value.length != 10) {
+                          return 'Phone number must be 10 digits';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.all(14.0),
+                      child: SelectState(
+                        onCountryChanged: (value) {
+                          print("Country changed to: $value");
+                          _registrationProvider.setCountryValue(value);
+                        },
+                        onStateChanged: (value) {
+                          print("State changed to: $value");
+                          _registrationProvider.setStateValue(value);
+                        },
+                        onCityChanged: (value) {
+                          print("City changed to: $value");
+                          _registrationProvider.setCityValue(value);
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(14.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Tax Registered?",
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w500),
                           ),
-                        )
-                      ],
+                          Flexible(
+                            child: Container(
+                              width: 150,
+                              child: DropdownButtonFormField(
+                                  items: _registrationProvider.taxOptions
+                                      .map<DropdownMenuItem<String>>((value) {
+                                    return DropdownMenuItem<String>(
+                                        value: value, child: Text(value));
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    _registrationProvider
+                                        .checkTaxStatus(value!);
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please select your tax status';
+                                    }
+                                    return null;
+                                  }),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                  Consumer<VendorRegistrationProvider>(
-                    builder: (BuildContext context, value, Widget? child) {
-                      return Padding(
+                    Consumer<VendorRegistrationProvider>(
+                      builder: (BuildContext context, value, Widget? child) {
+                        return Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: value.textFormField(),
                       );
-                    },
-                  ),
-                  InkWell(
-                    onTap: () {},
-                    child: Container(
-                      height: 40,
-                      width: MediaQuery.of(context).size.width - 40,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.yellow.shade900),
-                      child: Center(
-                        child: Text(
-                          'Save',
-                          style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                      },
+                    ),
+                    InkWell(
+                      onTap: () {
+                        _registrationProvider.saveVendorDetails();
+                      },
+                      child: Container(
+                        height: 40,
+                        width: MediaQuery.of(context).size.width - 40,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.yellow.shade900),
+                        child: Center(
+                          child: Text(
+                            'Save',
+                            style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
             ),
           )
